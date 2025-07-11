@@ -1,7 +1,7 @@
 package com.example.weatherly.api
 
 data class Current(
-    val cloud: Int,
+    val cloud: String,
     val condition: Condition,
     val dewpoint_c: String,
     val dewpoint_f: String,
@@ -11,10 +11,10 @@ data class Current(
     val gust_mph: String,
     val heatindex_c: String,
     val heatindex_f: String,
-    val humidity: Int,
-    val is_day: Int,
+    val humidity: String,
+    val is_day: String,
     val last_updated: String,
-    val last_updated_epoch: Int,
+    val last_updated_epoch: String,
     val precip_in: String,
     val precip_mm: String,
     val pressure_in: String,

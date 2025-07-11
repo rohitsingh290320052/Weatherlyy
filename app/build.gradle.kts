@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.weatherly"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.weatherly"
@@ -59,6 +59,8 @@ dependencies {
     val retrofitversion = "3.0.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitversion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitversion")
+    implementation("androidx.compose.runtime:runtime-livedata:1.8.3")
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
 
 
 }

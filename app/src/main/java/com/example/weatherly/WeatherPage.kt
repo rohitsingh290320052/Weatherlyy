@@ -1,187 +1,279 @@
-package com.example.weatherly
-
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import androidx.compose.ui.unit.*
+import coil.compose.AsyncImage
+import com.example.weatherly.WeatherViewModel
 import com.example.weatherly.api.NetworkResponse
 import com.example.weatherly.api.WeatherModel
 
+
+//@Composable
+//fun WeatherPage(viewModel: WeatherViewModel) {
+//    var city by remember { mutableStateOf("") }
+//    val weatherResult = viewModel.weatherResult.observeAsState()
+//    val keyboard = LocalSoftwareKeyboardController.current
+//
+//    // Gradient background
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(
+//                Brush.verticalGradient(
+//                    colors = listOf(Color(0xFF1E3C72), Color(0xFF2A5298)) // Deep blue gradient
+//                )
+//            )
+//            .padding(16.dp)
+//    ) {
+//        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//            OutlinedTextField(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .background(Color.White, RoundedCornerShape(12.dp)),
+//                value = city,
+//                onValueChange = { city = it },
+//                label = { Text("Search city") },
+//                trailingIcon = {
+//                    IconButton(onClick = {
+//                        viewModel.getData(city)
+//                        keyboard?.hide()
+//                    }) {
+//                        Icon(Icons.Default.Search, contentDescription = "Search")
+//                    }
+//                },
+//                singleLine = true,
+//                shape = RoundedCornerShape(12.dp)
+//            )
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            when (val result = weatherResult.value) {
+//                is NetworkResponse.Error -> {
+//                    Text(
+//                        text = result.message,
+//                        color = Color.Red,
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Medium
+//                    )
+//                }
+//
+//                NetworkResponse.Loading -> {
+//                    CircularProgressIndicator(color = Color.White)
+//                }
+//
+//                is NetworkResponse.Success -> {
+//                    WeatherDetails(result.data)
+//                }
+//
+//                null -> {
+//                    Text(
+//                        text = "Enter a city to get weather updates",
+//                        color = Color.White,
+//                        fontSize = 18.sp,
+//                        textAlign = TextAlign.Center,
+//                        modifier = Modifier.padding(24.dp)
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Composable
-fun WeatherPage(viewModel: WeatherViewModel){
-    var city by remember {
-        mutableStateOf("")
-    }
-
+fun WeatherPage(viewModel: WeatherViewModel) {
+    var city by remember { mutableStateOf("") }
     val weatherResult = viewModel.weatherResult.observeAsState()
-    val keyboardhidden = LocalSoftwareKeyboardController.current
+    val keyboard = LocalSoftwareKeyboardController.current
 
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+    val topPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.weight(1f),
-                value = city,
-                onValueChange = {
-                    city = it
-                },
-                label = {
-                    Text(text = "Search location")
-                }
+    // Gradient background
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF1E3C72), Color(0xFF2A5298)) // Blue gradient
+                )
             )
-            IconButton(onClick = {
-                viewModel.getData(city)
-                keyboardhidden?.hide()
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(top = topPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 💡 Stylized Search Bar
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(12.dp)),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    value = city,
+                    onValueChange = { city = it },
+                    label = { Text("Search city", color = Color.Gray) },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            viewModel.getData(city)
+                            keyboard?.hide()
+                        }) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        }
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        disabledBorderColor = Color.Transparent,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
+                )
 
-            }) {
-                Icon(imageVector = Icons.Default.Search,
-                    contentDescription = "Search for any location")
             }
-        }
-        when(val result = weatherResult.value){
-            is NetworkResponse.Error -> {
-                Text(text = result.message)
 
-            }
-            NetworkResponse.Loading -> {
-                CircularProgressIndicator()
-            }
-            is NetworkResponse.Success -> {
-                WeatherDetails(result.data)
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // 🌤️ Weather Result
+            when (val result = weatherResult.value) {
+                is NetworkResponse.Error -> {
+                    Text(
+                        text = result.message,
+                        color = Color.Red,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                NetworkResponse.Loading -> {
+                    CircularProgressIndicator(color = Color.White)
+                }
+
+                is NetworkResponse.Success -> {
+                    WeatherDetails(result.data)
+                }
+
+                null -> {
+                    Text(
+                        text = "Enter a city to get weather updates",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(24.dp)
+                    )
+                }
             }
-            null -> {}
         }
     }
-
 }
 
+
 @Composable
-fun WeatherDetails(data: WeatherModel){
+fun WeatherDetails(data: WeatherModel) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Bottom
-        ){
+        // Location
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
-                contentDescription = "Location icon",
-                modifier = Modifier.size(40.dp)
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(32.dp)
             )
-            Text(text = data.location.name, fontSize = 30.sp)
-            Spacer(Modifier.width(8.dp))
-            Text(text = data.location.country, fontSize = 18.sp, color = Color.Gray)
-
-
+            Text(
+                text = "${data.location.name}, ${data.location.country}",
+                color = Color.White,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
+
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Temperature
         Text(
-            text = "${data.current.temp_c} °C ",
-            fontSize = 56.sp,
+            text = "${data.current.temp_c}°C",
+            fontSize = 64.sp,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            color = Color.White
         )
 
         AsyncImage(
-            modifier = Modifier.size(160.dp),
-            model = "https:${data.current.condition.icon}".replace("64x64","128x128"),
-            contentDescription = "condition icon"
+            model = "https:${data.current.condition.icon}".replace("64x64", "128x128"),
+            contentDescription = "Weather icon",
+            modifier = Modifier.size(160.dp)
         )
+
         Text(
             text = data.current.condition.text,
-            fontSize = 56.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            color = Color.Gray
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
+            textAlign = TextAlign.Center
         )
 
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
-        Card() {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                )  {
-                    WeatherKeyVal("Humidity", data.current.humidity)
-                    WeatherKeyVal("Wind Speed", data.current.wind_kph+"kmph")
+        Spacer(modifier = Modifier.height(16.dp))
 
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                )  {
-                    WeatherKeyVal("UV", data.current.humidity)
-                    WeatherKeyVal("Precipitation", data.current.precip_mm+"mm")
-
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                )  {
-                    WeatherKeyVal("Local Time", data.location.localtime.split(" ")[1])
-                    WeatherKeyVal("Local Date", data.location.localtime.split(" ")[0])
-
-
-                }
+        // Weather Info Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                WeatherInfoRow("💧 Humidity", "${data.current.humidity}%")
+                WeatherInfoRow("🌬 Wind", "${data.current.wind_kph} km/h")
+                WeatherInfoRow("🔆 UV Index", "${data.current.uv}")
+                WeatherInfoRow("☔ Precipitation", "${data.current.precip_mm} mm")
+                WeatherInfoRow("🕒 Time", data.location.localtime.split(" ")[1])
+                WeatherInfoRow("📅 Date", data.location.localtime.split(" ")[0])
             }
         }
-
     }
-
-
 }
+
 @Composable
-fun WeatherKeyVal(key : String, value: String){
-    Column(
-        modifier = Modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+fun WeatherInfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = value)
-        Text(text = key)
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White
+        )
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White
+        )
     }
 }
